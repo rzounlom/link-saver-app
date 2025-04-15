@@ -5,10 +5,11 @@ import {
 } from "@heroicons/react/20/solid";
 
 import { Bookmark } from "@prisma/client";
+import { getTagColor } from "@/lib/utils/helpers";
 
 export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
   return (
-    <div className="border border-gray-200 rounded p-4 bg-white shadow-sm flex flex-col justify-between">
+    <div className="border border-gray-200 rounded p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
       <div>
         <h3 className="text-lg font-semibold">{bookmark.title}</h3>
         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -25,23 +26,36 @@ export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
           <ArrowTopRightOnSquareIcon className="w-4 h-4" />
         </a>
 
-        <div className="mt-2 flex flex-wrap gap-1">
-          {bookmark.tags.map((tag, idx) => (
-            <span
-              key={idx}
-              className="bg-gray-100 text-xs text-gray-600 px-2 py-1 rounded-full"
-            >
-              #{tag}
+        <div className="mt-2 flex flex-wrap gap-1 flex-1">
+          {bookmark.tags.slice(0, 5).map((tag, idx) => {
+            const { bg, text } = getTagColor(tag);
+            return (
+              <span
+                key={idx}
+                className={`text-xs px-2 py-1 rounded-full font-medium ${bg} ${text}`}
+              >
+                #{tag}
+              </span>
+            );
+          })}
+          {bookmark.tags.length > 5 && (
+            <span className="text-xs text-gray-500">
+              +{bookmark.tags.length - 5} more
             </span>
-          ))}
+          )}
+        </div>
+        <div className="mt-2 text-xs text-gray-400">
+          Last updated{" "}
+          {new Date(
+            bookmark.updatedAt || bookmark.createdAt
+          ).toLocaleDateString()}
         </div>
       </div>
-
       <div className="mt-4 flex justify-end gap-2 text-gray-400">
-        <button>
+        <button title="Edit">
           <PencilIcon className="w-5 h-5 hover:text-gray-600 transition hover:cursor-pointer" />
         </button>
-        <button>
+        <button title="Delete">
           <TrashIcon className="w-5 h-5 hover:text-red-600 transition hover:cursor-pointer" />
         </button>
       </div>
