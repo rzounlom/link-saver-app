@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowTopRightOnSquareIcon,
   PencilIcon,
@@ -5,11 +7,29 @@ import {
 } from "@heroicons/react/20/solid";
 
 import { Bookmark } from "@prisma/client";
+import DeleteBookmarkModal from "./DeleteBookmarkModal";
+import EditBookmarkModal from "./EditBookmarkModal";
 import { getTagColor } from "@/lib/utils/helpers";
+import { useState } from "react";
 
 export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
   return (
     <div className="border border-gray-200 rounded p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
+      <EditBookmarkModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        bookmark={bookmark}
+      />
+
+      <DeleteBookmarkModal
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        bookmarkId={bookmark.id}
+        title={bookmark.title}
+      />
       <div>
         <h3 className="text-lg font-semibold">{bookmark.title}</h3>
         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -52,10 +72,10 @@ export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
         </div>
       </div>
       <div className="mt-4 flex justify-end gap-2 text-gray-400">
-        <button title="Edit">
+        <button title="Edit" onClick={() => setEditOpen(true)}>
           <PencilIcon className="w-5 h-5 hover:text-gray-600 transition hover:cursor-pointer" />
         </button>
-        <button title="Delete">
+        <button title="Delete" onClick={() => setDeleteOpen(true)}>
           <TrashIcon className="w-5 h-5 hover:text-red-600 transition hover:cursor-pointer" />
         </button>
       </div>

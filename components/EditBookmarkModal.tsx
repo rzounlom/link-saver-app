@@ -3,18 +3,21 @@
 import { CancelButton, SaveButton } from "./Buttons";
 import { useActionState, useEffect, useRef, useState } from "react";
 
+import { Bookmark } from "@prisma/client";
 import FormAlert from "./FormAlert";
-import { createBookmark } from "@/app/dashboard/actions";
+import { editBookmark } from "@/app/dashboard/actions";
 
-interface AddBookmarkModalProps {
+interface EditBookmarkModalProps {
   open: boolean;
   onClose: () => void;
+  bookmark: Bookmark;
 }
 
-export default function AddBookmarkModal({
+export default function EditBookmarkModal({
   open,
   onClose,
-}: AddBookmarkModalProps) {
+  bookmark,
+}: EditBookmarkModalProps) {
   const initialState = {
     errorState: false,
     errors: {
@@ -25,13 +28,14 @@ export default function AddBookmarkModal({
       _form: undefined,
     },
   };
-  const [formState, action] = useActionState(createBookmark, initialState);
+  const updateAction = editBookmark.bind(null, bookmark.id);
+  const [formState, action] = useActionState(updateAction, initialState);
   const [formKey, setFormKey] = useState(0);
   const [cachedValues, setCachedValues] = useState({
-    title: "",
-    url: "",
-    description: "",
-    tags: "",
+    title: bookmark.title || "",
+    url: bookmark.url || "",
+    description: bookmark.description || "",
+    tags: bookmark.tags.toString() || "",
   });
   const titleRef = useRef<HTMLInputElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
@@ -48,7 +52,12 @@ export default function AddBookmarkModal({
   };
 
   const handleOnclose = () => {
-    setCachedValues({ title: "", url: "", description: "", tags: "" });
+    setCachedValues({
+      title: bookmark.title || "",
+      url: bookmark.url || "",
+      description: bookmark.description || "",
+      tags: bookmark.tags.toString() || "",
+    });
     setFormKey((prev) => prev + 1);
     onClose();
   };
@@ -81,7 +90,7 @@ export default function AddBookmarkModal({
           />
         )}
 
-        <h2 className="text-lg font-semibold mb-4">Add Bookmark</h2>
+        <h2 className="text-lg font-semibold mb-4">Edit Bookmark</h2>
         <input
           name="title"
           placeholder="Title"
