@@ -1,5 +1,7 @@
 "use client";
 
+import { CancelButton, DeleteButton } from "./Buttons";
+
 import { deleteBookmark } from "@/app/dashboard/actions"; // your server action
 import { useActionState } from "react";
 
@@ -27,7 +29,7 @@ export default function DeleteBookmarkModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 opacity-100">
       <form
         action={formAction}
         className="bg-white rounded-lg shadow p-6 w-full max-w-md transition-all"
@@ -41,20 +43,9 @@ export default function DeleteBookmarkModal({
           undone.
         </p>
 
-        <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
-          >
-            Delete
-          </button>
+        <div className="flex justify-end gap-4">
+          <CancelButton handleOnclose={onClose} />
+          <DeleteButton />
         </div>
       </form>
     </div>
