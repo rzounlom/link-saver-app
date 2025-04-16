@@ -1,18 +1,19 @@
-import { FC, Suspense } from "react";
-
 import BookmarkDashboardClient from "@/components/BookmarkDashboardClient";
 import BookmarkList from "@/components/BookmarkList";
 import BookmarkSkeletonGrid from "@/components/BookmarkSkeletonGrid";
+import { Suspense } from "react";
 
-const DashboardPage: FC = async () => {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; tag?: string }>;
+}) {
   return (
     <div>
       <BookmarkDashboardClient />
       <Suspense fallback={<BookmarkSkeletonGrid />}>
-        <BookmarkList />
+        <BookmarkList searchParams={searchParams} />
       </Suspense>
     </div>
   );
-};
-
-export default DashboardPage;
+}

@@ -10,11 +10,13 @@ import { Bookmark } from "@prisma/client";
 import DeleteBookmarkModal from "./DeleteBookmarkModal";
 import EditBookmarkModal from "./EditBookmarkModal";
 import { getTagColor } from "@/lib/utils/helpers";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <div className="border border-gray-200 rounded p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
@@ -52,7 +54,8 @@ export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
             return (
               <span
                 key={idx}
-                className={`text-xs px-2 py-1 rounded-full font-medium ${bg} ${text}`}
+                onClick={() => router.push(`/dashboard?tag=${tag}`)}
+                className={`text-xs px-2 py-1 rounded-full hover:cursor-pointer font-medium ${bg} ${text}`}
               >
                 #{tag}
               </span>
