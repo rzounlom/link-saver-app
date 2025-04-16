@@ -9,7 +9,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen">
       <aside className="w-64 bg-gray-100 p-4">
-        <nav className="space-y-2">
+        <nav className="space-y-2 flex flex-col gap-3">
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/tags">Tags</Link>
           <Link href="/account">Account</Link>
