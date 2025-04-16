@@ -33,7 +33,7 @@ export default async function BookmarkList({
         <p className="text-gray-500 col-span-full">No bookmarks yet.</p>
       ) : (
         bookmarks.map((bookmark) => (
-          <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+          <BookmarkCard key={bookmark.id} bookmark={bookmark} q={q} />
         ))
       )}
     </div>

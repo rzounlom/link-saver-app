@@ -9,14 +9,22 @@ import {
 import { Bookmark } from "@prisma/client";
 import DeleteBookmarkModal from "./DeleteBookmarkModal";
 import EditBookmarkModal from "./EditBookmarkModal";
-import { getTagColor } from "@/utils/helpers";
+import { getTagColor } from "@/utils/getTagColor";
+import { highlightMatch } from "@/utils/highlightMatch";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
+export default function BookmarkCard({
+  bookmark,
+  q,
+}: {
+  bookmark: Bookmark;
+  q: string | undefined;
+}) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const router = useRouter();
+  const query = q || "";
 
   return (
     <div className="border border-gray-200 rounded p-4 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
@@ -33,9 +41,12 @@ export default function BookmarkCard({ bookmark }: { bookmark: Bookmark }) {
         title={bookmark.title}
       />
       <div>
-        <h3 className="text-lg font-semibold">{bookmark.title}</h3>
+        <h3 className="text-lg font-semibold">
+          {highlightMatch(bookmark.title, query)}
+        </h3>
         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
           {bookmark.description}
+          {highlightMatch(bookmark.description || "", query)}
         </p>
 
         <a
