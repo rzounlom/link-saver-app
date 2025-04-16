@@ -1,9 +1,10 @@
 "use client";
 
 import { CancelButton, DeleteButton } from "./Buttons";
-import { useActionState, useEffect } from "react";
 
+import ModalShell from "./ModalShell";
 import { deleteBookmark } from "@/app/dashboard/actions"; // your server action
+import { useActionState } from "react";
 
 interface DeleteBookmarkModalProps {
   open: boolean;
@@ -22,14 +23,6 @@ export default function DeleteBookmarkModal({
   const deleteAction = deleteBookmark.bind(null, bookmarkId);
   const [formState, formAction] = useActionState(deleteAction, initialState);
 
-  useEffect(() => {
-    const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onEsc);
-    return () => window.removeEventListener("keydown", onEsc);
-  }, [onClose]);
-
   if (!open) return null;
 
   if (formState.success) {
@@ -37,29 +30,24 @@ export default function DeleteBookmarkModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 opacity-100"
-      onClick={onClose}
-    >
-      <div onClick={(e) => e.stopPropagation()}>
-        <form
-          action={formAction}
-          className="bg-white rounded-lg shadow p-6 w-full max-w-md transition-all"
-        >
-          <h2 className="text-lg font-semibold text-red-700 mb-4">
-            Delete Bookmark
-          </h2>
-          <p className="text-sm text-gray-700 mb-6">
-            Are you sure you want to delete{" "}
-            <strong>{title || "this bookmark"}</strong>? This action cannot be
-            undone.
-          </p>
-          <div className="flex justify-end gap-4">
-            <CancelButton handleOnclose={onClose} />
-            <DeleteButton />
-          </div>
-        </form>
-      </div>
-    </div>
+    <ModalShell open={open} onClose={onClose}>
+      <form
+        action={formAction}
+        className="bg-white rounded-lg shadow p-6 w-full max-w-md transition-all"
+      >
+        <h2 className="text-lg font-semibold text-red-700 mb-4">
+          Delete Bookmark
+        </h2>
+        <p className="text-sm text-gray-700 mb-6">
+          Are you sure you want to delete{" "}
+          <strong>{title || "this bookmark"}</strong>? This action cannot be
+          undone.
+        </p>
+        <div className="flex justify-end gap-4">
+          <CancelButton handleOnclose={onClose} />
+          <DeleteButton />
+        </div>
+      </form>
+    </ModalShell>
   );
 }

@@ -1,9 +1,16 @@
 "use client";
 
 import { CancelButton, SaveButton } from "./Buttons";
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import FormAlert from "./FormAlert";
+import ModalShell from "./ModalShell";
 import { createBookmark } from "@/app/dashboard/actions";
 
 interface AddBookmarkModalProps {
@@ -38,11 +45,11 @@ export default function AddBookmarkModal({
   const descRef = useRef<HTMLTextAreaElement>(null);
   const tagsRef = useRef<HTMLInputElement>(null);
 
-  const handleOnclose = () => {
+  const handleOnclose = useCallback(() => {
     setCachedValues({ title: "", url: "", description: "", tags: "" });
     setFormKey((prev) => prev + 1);
     onClose();
-  };
+  }, [onClose]);
 
   const handleBeforeSubmit = () => {
     setCachedValues({
@@ -59,14 +66,6 @@ export default function AddBookmarkModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState.successState]);
 
-  useEffect(() => {
-    const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleOnclose();
-    };
-    window.addEventListener("keydown", onEsc);
-    return () => window.removeEventListener("keydown", onEsc);
-  }, [handleOnclose]);
-
   if (!open) {
     {
       return null;
@@ -74,64 +73,59 @@ export default function AddBookmarkModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm"
-      onClick={handleOnclose}
-    >
-      <div onClick={(e) => e.stopPropagation()}>
-        <form
-          key={formKey}
-          action={action}
-          onSubmit={handleBeforeSubmit}
-          className="bg-white p-6 rounded shadow max-w-md w-full"
-        >
-          {formState.errorState && (
-            <FormAlert
-              alertType="error"
-              messages={Object.values(formState.errors).flat()}
-            />
-          )}
+    <ModalShell open={open} onClose={handleOnclose}>
+      <form
+        key={formKey}
+        action={action}
+        onSubmit={handleBeforeSubmit}
+        className="bg-white p-6 rounded shadow max-w-md w-full"
+      >
+        {formState.errorState && (
+          <FormAlert
+            alertType="error"
+            messages={Object.values(formState.errors).flat()}
+          />
+        )}
 
-          <h2 className="text-lg font-semibold mb-4">Add Bookmark</h2>
-          <div className="flex gap-4 items-center">
-            <input
-              name="title"
-              placeholder="Title"
-              className="input mb-2"
-              defaultValue={cachedValues.title}
-              ref={titleRef}
-            />
-            <input
-              name="url"
-              placeholder="URL"
-              className="input mb-2"
-              defaultValue={cachedValues.url}
-              ref={urlRef}
-            />
-          </div>
-          <div className="flex gap-4 items-center">
-            <textarea
-              name="description"
-              placeholder="Description"
-              className="input mb-2"
-              defaultValue={cachedValues.description}
-              ref={descRef}
-            />
-            <input
-              name="tags"
-              placeholder="Tags (comma-separated)"
-              className="input mb-4"
-              defaultValue={cachedValues.tags}
-              ref={tagsRef}
-            />
-          </div>
+        <h2 className="text-lg font-semibold mb-4">Add Bookmark</h2>
+        <div className="flex gap-4 items-center">
+          <input
+            name="title"
+            placeholder="Title"
+            className="input mb-2"
+            defaultValue={cachedValues.title}
+            ref={titleRef}
+          />
+          <input
+            name="url"
+            placeholder="URL"
+            className="input mb-2"
+            defaultValue={cachedValues.url}
+            ref={urlRef}
+          />
+        </div>
+        <div className="flex gap-4 items-center">
+          <textarea
+            name="description"
+            placeholder="Description"
+            className="input mb-2"
+            defaultValue={cachedValues.description}
+            ref={descRef}
+          />
+          <input
+            name="tags"
+            placeholder="Tags (comma-separated)"
+            className="input mb-4"
+            defaultValue={cachedValues.tags}
+            ref={tagsRef}
+          />
+        </div>
 
-          <div className="flex justify-end gap-4">
-            <CancelButton handleOnclose={handleOnclose} />
-            <SaveButton />
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex justify-end gap-4">
+          <CancelButton handleOnclose={handleOnclose} />
+          <SaveButton />
+        </div>
+      </form>
+    </ModalShell>
   );
 }
