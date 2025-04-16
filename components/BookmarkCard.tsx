@@ -9,7 +9,7 @@ import {
 import { Bookmark } from "@prisma/client";
 import DeleteBookmarkModal from "./DeleteBookmarkModal";
 import EditBookmarkModal from "./EditBookmarkModal";
-import { getTagColor } from "@/lib/utils/helpers";
+import { getTagColor } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
