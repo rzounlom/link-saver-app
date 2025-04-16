@@ -1,9 +1,9 @@
 "use client";
 
 import { CancelButton, DeleteButton } from "./Buttons";
+import { useActionState, useEffect } from "react";
 
 import { deleteBookmark } from "@/app/dashboard/actions"; // your server action
-import { useActionState } from "react";
 
 interface DeleteBookmarkModalProps {
   open: boolean;
@@ -21,6 +21,14 @@ export default function DeleteBookmarkModal({
   const initialState = { success: false };
   const deleteAction = deleteBookmark.bind(null, bookmarkId);
   const [formState, formAction] = useActionState(deleteAction, initialState);
+
+  useEffect(() => {
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [onClose]);
 
   if (!open) return null;
 

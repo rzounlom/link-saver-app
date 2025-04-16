@@ -59,6 +59,14 @@ export default function AddBookmarkModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState.successState]);
 
+  useEffect(() => {
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleOnclose();
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [handleOnclose]);
+
   if (!open) {
     {
       return null;

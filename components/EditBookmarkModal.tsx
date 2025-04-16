@@ -1,7 +1,13 @@
 "use client";
 
 import { CancelButton, SaveButton } from "./Buttons";
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { Bookmark } from "@prisma/client";
 import FormAlert from "./FormAlert";
@@ -51,7 +57,7 @@ export default function EditBookmarkModal({
     });
   };
 
-  const handleOnclose = () => {
+  const handleOnclose = useCallback(() => {
     setCachedValues({
       title: bookmark.title || "",
       url: bookmark.url || "",
@@ -60,7 +66,7 @@ export default function EditBookmarkModal({
     });
     setFormKey((prev) => prev + 1);
     onClose();
-  };
+  }, [bookmark, onClose]);
 
   useEffect(() => {
     if (formState.successState) {
@@ -68,6 +74,14 @@ export default function EditBookmarkModal({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState.successState]);
+
+  useEffect(() => {
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleOnclose();
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [handleOnclose]);
 
   if (!open) {
     {
