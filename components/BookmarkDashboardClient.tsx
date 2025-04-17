@@ -9,6 +9,7 @@ export default function BookmarkDashboardClient() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("q") || "");
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,15 +23,29 @@ export default function BookmarkDashboardClient() {
     router.push(`/dashboard?${newParams.toString()}`);
   };
 
+  const handleClearFilters = (event: { preventDefault: () => void }) => {
+    // 1. Stop browser from reloading the page
+    event.preventDefault();
+    // 2. Reset the URL cleanly
+    setSearch(""); // ✅ Reset local state
+
+    router.push("/dashboard?"); // ✅ Ensure route changes (even if it "looks" the same)
+
+    // 3. Optionally force refresh (if nothing re-renders)
+    router.refresh(); // ✅ Triggers a re-render + server component reload
+  };
+
   return (
     <>
       <div className="flex justify-between items-center mb-4">
         <form onSubmit={handleSearch} className="flex gap-2">
           <input
+            type="text"
             name="search"
             placeholder="Search bookmarks..."
             className="border rounded px-3 py-2 text-sm w-60"
-            defaultValue={searchParams.get("q") || ""}
+            onChange={(e) => setSearch(e.target.value)}
+            value={search}
           />
           <button
             type="submit"
@@ -38,10 +53,18 @@ export default function BookmarkDashboardClient() {
           >
             Search
           </button>
+          {search && (
+            <button
+              onClick={handleClearFilters}
+              className="ml-2 text-sm text-gray-500 hover:text-gray-700 hover:cursor-pointer  underline"
+            >
+              Clear filters
+            </button>
+          )}
         </form>
         <button
           onClick={() => setOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition hover:cursor-pointer duration-300 ease-in-out"
         >
           + Add Bookmark
         </button>
