@@ -1,27 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import AddBookmarkModal from "./AddBookmarkModal";
-import { useState } from "react";
+import { useDebounce } from "use-debounce";
 
 export default function BookmarkDashboardClient() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
+  const [debouncedSearch] = useDebounce(search, 400);
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const q = e.currentTarget.search.value;
-    const newParams = new URLSearchParams(searchParams.toString());
-    if (q) {
-      newParams.set("q", q);
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (debouncedSearch) {
+      params.set("q", debouncedSearch);
     } else {
-      newParams.delete("q");
+      params.delete("q");
     }
-    router.push(`/dashboard?${newParams.toString()}`);
-  };
+    router.push(`/dashboard?${params.toString()}`);
+  }, [debouncedSearch, router, searchParams]);
 
   const handleClearFilters = (event: { preventDefault: () => void }) => {
     // 1. Stop browser from reloading the page
@@ -38,7 +38,7 @@ export default function BookmarkDashboardClient() {
   return (
     <>
       <div className="flex justify-between items-center mb-4">
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="flex gap-2">
           <input
             type="text"
             name="search"
@@ -47,12 +47,6 @@ export default function BookmarkDashboardClient() {
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
-          <button
-            type="submit"
-            className="bg-gray-200 hover:bg-blue-400 px-3 rounded text-sm rounded hover:bg-blue-600 hover:cursor-pointer hover:text-white transition-all duration-300 ease-in-out"
-          >
-            Search
-          </button>
           {search && (
             <button
               onClick={handleClearFilters}
@@ -61,7 +55,7 @@ export default function BookmarkDashboardClient() {
               Clear filters
             </button>
           )}
-        </form>
+        </div>
         <button
           onClick={() => setOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition hover:cursor-pointer duration-300 ease-in-out"
