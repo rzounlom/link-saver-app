@@ -10,9 +10,9 @@ import {
 } from "react";
 
 import { Bookmark } from "@prisma/client";
-import FormAlert from "./FormAlert";
 import ModalShell from "./ModalShell";
 import { editBookmark } from "@/app/dashboard/actions";
+import { toast } from "sonner";
 
 interface EditBookmarkModalProps {
   open: boolean;
@@ -71,10 +71,27 @@ export default function EditBookmarkModal({
 
   useEffect(() => {
     if (formState.successState) {
+      toast.success("Bookmark added!");
       handleOnclose(); // close and reset
     }
+
+    if (formState.errorState && formState.errors) {
+      const messages = Object.values(formState.errors).flat();
+      toast.error(
+        <div>
+          <p className="mb-1 font-semibold">
+            There were issues with your submission:
+          </p>
+          <ul className="list-disc list-inside text-sm">
+            {messages.map((msg, idx) => (
+              <li key={idx}>{msg}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState.successState]);
+  }, [formState.successState, formState.errorState, formState.errors]);
 
   if (!open) {
     {
@@ -90,13 +107,6 @@ export default function EditBookmarkModal({
         onSubmit={handleBeforeSubmit}
         className="bg-white p-6 rounded shadow max-w-md w-full"
       >
-        {formState.errorState && (
-          <FormAlert
-            alertType="error"
-            messages={Object.values(formState.errors).flat()}
-          />
-        )}
-
         <h2 className="text-lg font-semibold mb-4">Edit Bookmark</h2>
         <div className="flex gap-4 items-center">
           <input

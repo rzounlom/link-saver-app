@@ -1,10 +1,11 @@
 "use client";
 
 import { CancelButton, DeleteButton } from "./Buttons";
+import { useActionState, useEffect } from "react";
 
 import ModalShell from "./ModalShell";
 import { deleteBookmark } from "@/app/dashboard/actions"; // your server action
-import { useActionState } from "react";
+import { toast } from "sonner";
 
 interface DeleteBookmarkModalProps {
   open: boolean;
@@ -19,22 +20,30 @@ export default function DeleteBookmarkModal({
   bookmarkId,
   title,
 }: DeleteBookmarkModalProps) {
-  const initialState = { success: false };
-  const deleteAction = deleteBookmark.bind(null, bookmarkId);
-  const [formState, formAction] = useActionState(deleteAction, initialState);
+  const initialState = { successState: false, errorState: false };
+  const deleteAction = deleteBookmark.bind(null, { bookmarkId });
+  const [formState, action] = useActionState(deleteAction, initialState);
+
+  useEffect(() => {
+    if (formState.successState) {
+      toast.success("Bookmark deleted successfully");
+      onClose(); // Close modal after toast
+    }
+
+    if (formState.errorState) {
+      toast.error("Failed to delete bookmark. Please try again.");
+    }
+  }, [formState.successState, formState.errorState, onClose, formState]);
 
   if (!open) return null;
-
-  if (formState.success) {
-    onClose();
-  }
 
   return (
     <ModalShell open={open} onClose={onClose}>
       <form
-        action={formAction}
+        action={action}
         className="bg-white rounded-lg shadow p-6 w-full max-w-md transition-all"
       >
+        <input type="hidden" name="confirm" value="true" />
         <h2 className="text-lg font-semibold text-red-700 mb-4">
           Delete Bookmark
         </h2>

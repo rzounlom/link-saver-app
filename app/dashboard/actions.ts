@@ -17,6 +17,11 @@ interface CreateLinkFormState {
   };
 }
 
+export interface DeleteLinkFormState {
+  successState: boolean;
+  errorState?: boolean;
+}
+
 export async function createBookmark(
   formState: CreateLinkFormState,
   formData: FormData
@@ -160,29 +165,27 @@ export async function editBookmark(
   }
 }
 
-export async function deleteBookmark(
-  id: string
-): Promise<{ success: boolean }> {
+export async function deleteBookmark(prevState: { bookmarkId: string }) {
+  const { bookmarkId } = prevState;
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  if (!userId) return { successState: false, errorState: true };
 
   try {
     await db.bookmark.delete({
-      where: {
-        id,
-      },
+      where: { id: bookmarkId },
     });
 
     return {
-      success: true,
+      successState: true,
+      errorState: false,
     };
   } catch (error) {
     console.error("Error deleting bookmark:", error);
     return {
-      success: false,
+      successState: false,
+      errorState: true,
     };
   } finally {
-    //revalidate dashboard
     revalidatePath("/dashboard");
   }
 }
